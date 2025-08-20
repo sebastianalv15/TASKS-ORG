@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TaskForm from "./components/TaskForm";
 import TaskBoard from "./components/TaskBoard";
 
 export default function App() {
-  const [tasks, setTasks] = useState([]);
+  // Inicializa las tareas desde localStorage si existen
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem("tasks");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [editingTask, setEditingTask] = useState(null);
+
+  // Guarda las tareas en localStorage cada vez que cambien
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = (task) => {
     setTasks([...tasks, { ...task, id: Date.now() }]);
   };
 
   const updateTask = (updatedTask) => {
-    setTasks(tasks.map(t => (t.id === updatedTask.id ? updatedTask : t)));
+    setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     setEditingTask(null);
   };
 
@@ -22,7 +32,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-8">
       <h1 className="text-4xl font-extrabold text-center mb-8 text-gray-800 drop-shadow">
-        Task Organizer 
+        Task Organizer
       </h1>
 
       {editingTask ? (
